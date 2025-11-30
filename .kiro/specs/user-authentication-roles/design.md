@@ -81,20 +81,93 @@ app/Modules/{ModuleName}/
 └── Jobs/             # Async tasks
 ```
 
+### Key Design Decisions
+
+**1. Modular Monolithic Architecture**
+
+_Rationale_: While the platform has many distinct features, a modular monolithic approach was chosen over microservices for several reasons:
+
+-   Simpler deployment and operations for initial launch
+-   Reduced infrastructure complexity and costs
+-   Easier data consistency management across features
+-   Ability to refactor into microservices later if needed
+-   Shared authentication and authorization layer
+
+**2. Token-Based Authentication with Laravel Sanctum**
+
+_Rationale_: Laravel Sanctum provides a lightweight authentication system perfect for mobile APIs:
+
+-   Simple token management without OAuth complexity
+-   Built-in support for token expiration and refresh
+-   Seamless integration with Laravel's authorization system
+-   Lower overhead than JWT for mobile applications
+-   Native support for multiple authentication guards
+
+**3. Redis for Caching and Queues**
+
+_Rationale_: Redis serves multiple purposes in the architecture:
+
+-   Fast session storage for stateless API servers
+-   Efficient caching layer for frequently accessed data
+-   Reliable queue backend for asynchronous processing
+-   Real-time features support through pub/sub
+-   Distributed rate limiting across multiple servers
+
+**4. Offline-First Capabilities**
+
+_Rationale_: Emergency and location tracking features require offline support:
+
+-   Critical safety features must work without connectivity
+-   Location data queuing ensures no data loss
+-   Cached data allows continued app usage
+-   Automatic sync when connectivity restored
+-   Enhanced user experience in remote areas
+
+**5. Property-Based Testing Strategy**
+
+_Rationale_: Property-based testing provides superior correctness guarantees:
+
+-   Tests universal properties across all inputs, not just examples
+-   Catches edge cases that manual test cases miss
+-   Validates business rules hold for entire input space
+-   Complements unit tests for comprehensive coverage
+-   Particularly valuable for complex business logic like payments and reservations
+
+**6. Event-Driven Architecture for Notifications**
+
+_Rationale_: Laravel events and listeners decouple notification logic:
+
+-   Notification logic separated from core business logic
+-   Easy to add new notification channels
+-   Asynchronous processing prevents blocking
+-   Consistent notification patterns across modules
+-   Simplified testing of business logic without notification concerns
+
+**7. Repository Pattern for Data Access**
+
+_Rationale_: Repository pattern provides abstraction over data access:
+
+-   Business logic independent of data storage details
+-   Easier to test services with mocked repositories
+-   Flexibility to change data sources without affecting services
+-   Consistent data access patterns across modules
+-   Simplified query optimization and caching strategies
+
 ### Technology Stack
 
-- **Backend Framework**: Laravel 10.x
-- **Database**: MySQL 8.0 (primary), Redis (cache/sessions/queues)
-- **Authentication**: Laravel Sanctum (token-based API authentication)
-- **Real-time**: Laravel Broadcasting with Pusher or Socket.io
-- **Queue System**: Laravel Queues with Redis driver
-- **File Storage**: Laravel Storage with S3 driver
-- **Push Notifications**: Firebase Cloud Messaging (FCM)
-- **Payment Processing**: Stripe API
-- **Weather Data**: OpenWeatherMap API
-- **Email**: SendGrid API
-- **SMS**: Twilio API
-- **API Documentation**: Scribe for Laravel
+-   **Backend Framework**: Laravel 10.x
+-   **Database**: MySQL 8.0 (primary), Redis (cache/sessions/queues)
+-   **Authentication**: Laravel Sanctum (token-based API authentication)
+-   **Real-time**: Laravel Broadcasting with Pusher or Socket.io
+-   **Queue System**: Laravel Queues with Redis driver
+-   **File Storage**: Laravel Storage with S3 driver
+-   **Push Notifications**: Firebase Cloud Messaging (FCM)
+-   **Payment Processing**: Stripe API
+-   **Weather Data**: OpenWeatherMap API
+-   **Email**: SendGrid API
+-   **SMS**: Twilio API
+-   **API Documentation**: Scribe for Laravel
+-   **Property-Based Testing**: Pest PHP with Pest Property Testing plugin
 
 ## Components and Interfaces
 
@@ -104,11 +177,11 @@ app/Modules/{ModuleName}/
 
 **Key Components**:
 
-- `AuthController`: Handles registration, login, logout, password reset
-- `AuthService`: Business logic for authentication operations
-- `UserRepository`: Data access for user records
-- `RoleRepository`: Data access for roles and permissions
-- `TokenService`: Manages access tokens and refresh tokens
+-   `AuthController`: Handles registration, login, logout, password reset
+-   `AuthService`: Business logic for authentication operations
+-   `UserRepository`: Data access for user records
+-   `RoleRepository`: Data access for roles and permissions
+-   `TokenService`: Manages access tokens and refresh tokens
 
 **Key Interfaces**:
 
@@ -138,11 +211,11 @@ interface UserRepositoryInterface {
 
 **Key Components**:
 
-- `LocationController`: Handles location updates and rescue requests
-- `LocationService`: Business logic for location tracking
-- `RescueService`: Manages rescue request lifecycle
-- `LocationRepository`: Stores and retrieves location data
-- `RescueRequestRepository`: Manages rescue request records
+-   `LocationController`: Handles location updates and rescue requests
+-   `LocationService`: Business logic for location tracking
+-   `RescueService`: Manages rescue request lifecycle
+-   `LocationRepository`: Stores and retrieves location data
+-   `RescueRequestRepository`: Manages rescue request records
 
 **Key Interfaces**:
 
@@ -168,10 +241,10 @@ interface RescueServiceInterface {
 
 **Key Components**:
 
-- `TeamController`: Handles team CRUD operations
-- `TeamService`: Business logic for team management
-- `TeamRepository`: Data access for teams
-- `TeamMemberRepository`: Manages team memberships
+-   `TeamController`: Handles team CRUD operations
+-   `TeamService`: Business logic for team management
+-   `TeamRepository`: Data access for teams
+-   `TeamMemberRepository`: Manages team memberships
 
 **Key Interfaces**:
 
@@ -191,12 +264,12 @@ interface TeamServiceInterface {
 
 **Key Components**:
 
-- `GroupController`: Handles group operations
-- `EventController`: Manages event creation and participation
-- `GroupService`: Business logic for groups
-- `EventService`: Business logic for events
-- `GroupRepository`: Data access for groups
-- `EventRepository`: Data access for events
+-   `GroupController`: Handles group operations
+-   `EventController`: Manages event creation and participation
+-   `GroupService`: Business logic for groups
+-   `EventService`: Business logic for events
+-   `GroupRepository`: Data access for groups
+-   `EventRepository`: Data access for events
 
 **Key Interfaces**:
 
@@ -222,12 +295,12 @@ interface EventServiceInterface {
 
 **Key Components**:
 
-- `VenueController`: Handles venue operations
-- `ReservationController`: Manages bookings
-- `VenueService`: Business logic for venues
-- `ReservationService`: Business logic for reservations
-- `VenueRepository`: Data access for venues
-- `ReservationRepository`: Data access for reservations
+-   `VenueController`: Handles venue operations
+-   `ReservationController`: Manages bookings
+-   `VenueService`: Business logic for venues
+-   `ReservationService`: Business logic for reservations
+-   `VenueRepository`: Data access for venues
+-   `ReservationRepository`: Data access for reservations
 
 **Key Interfaces**:
 
@@ -252,9 +325,9 @@ interface ReservationServiceInterface {
 
 **Key Components**:
 
-- `WeatherController`: Handles weather requests
-- `WeatherService`: Business logic and API integration
-- `WeatherCacheService`: Manages weather data caching
+-   `WeatherController`: Handles weather requests
+-   `WeatherService`: Business logic and API integration
+-   `WeatherCacheService`: Manages weather data caching
 
 **Key Interfaces**:
 
@@ -273,9 +346,9 @@ interface WeatherServiceInterface {
 
 **Key Components**:
 
-- `OfferController`: Handles offer operations
-- `OfferService`: Business logic for offers
-- `OfferRepository`: Data access for offers
+-   `OfferController`: Handles offer operations
+-   `OfferService`: Business logic for offers
+-   `OfferRepository`: Data access for offers
 
 **Key Interfaces**:
 
@@ -295,10 +368,10 @@ interface OfferServiceInterface {
 
 **Key Components**:
 
-- `NotificationController`: Handles notification preferences
-- `NotificationService`: Business logic for notifications
-- `PushNotificationService`: FCM integration
-- `NotificationRepository`: Stores notification history
+-   `NotificationController`: Handles notification preferences
+-   `NotificationService`: Business logic for notifications
+-   `PushNotificationService`: FCM integration
+-   `NotificationRepository`: Stores notification history
 
 **Key Interfaces**:
 
@@ -318,10 +391,10 @@ interface NotificationServiceInterface {
 
 **Key Components**:
 
-- `PaymentController`: Handles payment operations
-- `PaymentService`: Business logic for payments
-- `StripeService`: Stripe API integration
-- `TransactionRepository`: Stores transaction records
+-   `PaymentController`: Handles payment operations
+-   `PaymentService`: Business logic for payments
+-   `StripeService`: Stripe API integration
+-   `TransactionRepository`: Stores transaction records
 
 **Key Interfaces**:
 
@@ -340,10 +413,10 @@ interface PaymentServiceInterface {
 
 **Key Components**:
 
-- `MessageController`: Handles message operations
-- `MessageService`: Business logic for messaging
-- `MessageRepository`: Stores messages
-- `ConversationRepository`: Manages conversations
+-   `MessageController`: Handles message operations
+-   `MessageService`: Business logic for messaging
+-   `MessageRepository`: Stores messages
+-   `ConversationRepository`: Manages conversations
 
 **Key Interfaces**:
 
@@ -363,10 +436,10 @@ interface MessageServiceInterface {
 
 **Key Components**:
 
-- `RatingController`: Handles rating operations
-- `ReviewController`: Manages reviews
-- `RatingService`: Business logic for ratings
-- `RatingRepository`: Stores ratings and reviews
+-   `RatingController`: Handles rating operations
+-   `ReviewController`: Manages reviews
+-   `RatingService`: Business logic for ratings
+-   `RatingRepository`: Stores ratings and reviews
 
 **Key Interfaces**:
 
@@ -386,9 +459,9 @@ interface RatingServiceInterface {
 
 **Key Components**:
 
-- `AnalyticsController`: Handles analytics requests
-- `AnalyticsService`: Aggregates and computes metrics
-- `ReportService`: Generates reports
+-   `AnalyticsController`: Handles analytics requests
+-   `AnalyticsService`: Aggregates and computes metrics
+-   `ReportService`: Generates reports
 
 **Key Interfaces**:
 
@@ -409,9 +482,9 @@ interface AnalyticsServiceInterface {
 
 **Key Components**:
 
-- `AdminController`: Handles admin operations
-- `AdminService`: Business logic for admin functions
-- `ContentModerationService`: Manages content moderation
+-   `AdminController`: Handles admin operations
+-   `AdminService`: Business logic for admin functions
+-   `ContentModerationService`: Manages content moderation
 
 **Key Interfaces**:
 
@@ -431,9 +504,9 @@ interface AdminServiceInterface {
 
 **Key Components**:
 
-- `SearchController`: Handles search requests
-- `SearchService`: Business logic for search
-- `SearchIndexService`: Manages search indexing
+-   `SearchController`: Handles search requests
+-   `SearchService`: Business logic for search
+-   `SearchIndexService`: Manages search indexing
 
 **Key Interfaces**:
 
@@ -444,6 +517,83 @@ interface SearchServiceInterface {
     public function searchEvents(string $query, array $filters): Collection;
     public function searchOffers(string $query, array $filters): Collection;
     public function saveSearch(int $userId, string $query, array $filters): bool;
+}
+```
+
+### 15. Activity Feed Module
+
+**Purpose**: Displays recent platform activities from groups, teams, and followed sellers.
+
+**Key Components**:
+
+-   `ActivityFeedController`: Handles activity feed requests
+-   `ActivityFeedService`: Business logic for activity aggregation
+-   `ActivityRepository`: Stores and retrieves activity records
+
+**Key Interfaces**:
+
+```php
+interface ActivityFeedServiceInterface {
+    public function getFeed(int $userId, int $limit = 50): Collection;
+    public function createActivity(string $type, int $actorId, array $data): Activity;
+    public function getActivitiesForGroups(array $groupIds, Carbon $since): Collection;
+    public function getActivitiesForSellers(array $sellerIds, Carbon $since): Collection;
+    public function markActivitiesAsRead(int $userId, array $activityIds): bool;
+}
+```
+
+**Design Considerations**:
+
+The activity feed aggregates events from multiple sources (groups, teams, sellers) into a unified timeline. Key design decisions:
+
+-   **Fan-out on Write**: When an activity occurs (e.g., new event created), it's written to the activity table with references to relevant entities. The feed is then constructed by querying activities related to the user's groups, teams, and followed sellers.
+-   **Pagination**: Activities are loaded in batches (default 50) to optimize performance and reduce data transfer.
+-   **Caching**: User feeds are cached in Redis for 5 minutes to reduce database load for frequently accessed feeds.
+-   **Activity Types**: Standardized activity types (event_created, offer_posted, member_joined, etc.) enable consistent rendering and filtering.
+-   **Real-time Updates**: New activities trigger broadcast events to update feeds in real-time for online users.
+-   **60-Second SLA**: The system ensures new activities appear in relevant feeds within 60 seconds, balancing real-time requirements with system performance.
+
+### 16. Emergency Contact Module
+
+**Purpose**: Manages emergency contacts for users and notifies them during rescue requests.
+
+**Key Components**:
+
+-   `EmergencyContactController`: Handles emergency contact operations
+-   `EmergencyContactService`: Business logic for emergency contacts
+-   `EmergencyContactRepository`: Data access for emergency contacts
+
+**Key Interfaces**:
+
+```php
+interface EmergencyContactServiceInterface {
+    public function addContact(int $userId, array $data): EmergencyContact;
+    public function updateContact(int $contactId, array $data): EmergencyContact;
+    public function removeContact(int $contactId): bool;
+    public function getContacts(int $userId): Collection;
+    public function notifyContacts(int $userId, RescueRequest $request): void;
+}
+```
+
+### 17. Logging and Audit Module
+
+**Purpose**: Provides comprehensive logging and audit trails for security and troubleshooting.
+
+**Key Components**:
+
+-   `AuditLogController`: Handles audit log queries
+-   `AuditLogService`: Business logic for logging
+-   `AuditLogRepository`: Stores and retrieves audit logs
+
+**Key Interfaces**:
+
+```php
+interface AuditLogServiceInterface {
+    public function logOperation(string $type, int $userId, array $data): void;
+    public function logError(Exception $exception, array $context): void;
+    public function logSecurityEvent(string $type, int $userId, array $data): void;
+    public function getLogs(array $filters): Collection;
+    public function archiveOldLogs(Carbon $before): int;
 }
 ```
 
@@ -669,6 +819,45 @@ class Badge extends Model {
 }
 ```
 
+**Activity Model**:
+
+```php
+class Activity extends Model {
+    protected $fillable = [
+        'type', 'actor_id', 'target_type', 'target_id',
+        'data', 'created_at'
+    ];
+
+    public function actor(): BelongsTo;
+    public function target(): MorphTo;
+}
+```
+
+**AuditLog Model**:
+
+```php
+class AuditLog extends Model {
+    protected $fillable = [
+        'type', 'user_id', 'operation', 'data',
+        'ip_address', 'user_agent', 'severity', 'created_at'
+    ];
+
+    public function user(): BelongsTo;
+}
+```
+
+**BlockedDate Model**:
+
+```php
+class BlockedDate extends Model {
+    protected $fillable = [
+        'venue_id', 'start_date', 'end_date', 'reason'
+    ];
+
+    public function venue(): BelongsTo;
+}
+```
+
 ### Database Schema Relationships
 
 ```
@@ -689,12 +878,16 @@ users (1) ──< (M) notifications
 users (1) ──< (M) emergency_contacts
 users (M) ──< (M) badges
 users (M) ──< (M) roles
+users (1) ──< (M) activities (as actor)
+users (1) ──< (M) audit_logs
 
 groups (1) ──< (M) events
 venues (1) ──< (M) reservations
+venues (1) ──< (M) blocked_dates
 venues (1) ──< (M) ratings (polymorphic)
 events (1) ──< (M) ratings (polymorphic)
 sellers (1) ──< (M) ratings (polymorphic)
+activities (M) ──> (1) target (polymorphic)
 ```
 
 ## Correctness Properties
@@ -1109,43 +1302,227 @@ _For any_ search results, they should be sorted by relevance score based on the 
 _For any_ search results, users should be able to sort by price, rating, distance, or date.
 **Validates: Requirements 46.2**
 
+### Emergency Contact Properties
+
+**Property 96: Emergency contact storage**
+_For any_ emergency contact added by a user, name, phone number, and email address should be stored.
+**Validates: Requirements 42.1**
+
+**Property 97: Emergency contact notification**
+_For any_ rescue request triggered, notifications should be sent to all emergency contacts with the user's location.
+**Validates: Requirements 42.2**
+
+**Property 98: Emergency contact validation**
+_For any_ emergency contact update, phone number and email format should be validated.
+**Validates: Requirements 42.4**
+
+**Property 99: Emergency contact removal**
+_For any_ removed emergency contact, emergency notifications should stop being sent to them.
+**Validates: Requirements 42.5**
+
+### Activity Feed Properties
+
+**Property 100: Activity feed display**
+_For any_ user opening the activity feed, recent activities from their groups, teams, and followed sellers should be displayed.
+**Validates: Requirements 44.1**
+
+**Property 101: Event activity timing**
+_For any_ new event created in a user's group, it should appear in the activity feed within 60 seconds.
+**Validates: Requirements 44.2**
+
+**Property 102: Offer activity display**
+_For any_ new offer posted by a followed seller, it should be displayed in the activity feed for users following that seller.
+**Validates: Requirements 44.3**
+
+### Transaction and Export Properties
+
+**Property 103: Transaction export generation**
+_For any_ transaction history export request, a downloadable report in PDF or CSV format should be generated.
+**Validates: Requirements 35.5**
+
+**Property 104: Refund status update**
+_For any_ processed refund, the transaction status should be updated and refund information displayed.
+**Validates: Requirements 35.4**
+
+### Messaging Enhancement Properties
+
+**Property 105: Conversation search**
+_For any_ search within a conversation, matching chat messages with context should be returned.
+**Validates: Requirements 37.4**
+
+**Property 106: Message deletion privacy**
+_For any_ deleted chat message, it should be removed from the deleter's view but retained for other participants.
+**Validates: Requirements 37.5**
+
+### Review Enhancement Properties
+
+**Property 107: Review helpful marking**
+_For any_ review marked as helpful by a user, the helpful count should be incremented.
+**Validates: Requirements 39.4**
+
+**Property 108: Review reporting**
+_For any_ inappropriate review reported, it should be flagged for admin review.
+**Validates: Requirements 39.5**
+
+**Property 109: Review notification**
+_For any_ submitted rating or review, the venue owner, event organizer, or seller should be notified.
+**Validates: Requirements 38.5**
+
+### Analytics Properties
+
+**Property 110: Analytics metrics display**
+_For any_ admin accessing the analytics dashboard, key metrics including active users, revenue, and engagement rates should be displayed.
+**Validates: Requirements 40.1**
+
+**Property 111: Analytics date filtering**
+_For any_ date range selected by an admin, all metrics should be filtered to the specified period.
+**Validates: Requirements 40.2**
+
+**Property 112: Venue analytics**
+_For any_ admin viewing venue analytics, booking rates, popular venues, and revenue by venue should be shown.
+**Validates: Requirements 40.3**
+
+**Property 113: Event analytics**
+_For any_ admin viewing event analytics, attendance rates, popular events, and revenue by event should be shown.
+**Validates: Requirements 40.4**
+
+**Property 114: Analytics export**
+_For any_ analytics export request, a comprehensive report in PDF or Excel format should be generated.
+**Validates: Requirements 40.5**
+
+**Property 115: Engagement metrics display**
+_For any_ admin viewing engagement metrics, daily active users, session duration, and feature usage should be displayed.
+**Validates: Requirements 41.1**
+
+**Property 116: User retention analysis**
+_For any_ admin analyzing user retention, cohort analysis and churn rates should be shown.
+**Validates: Requirements 41.2**
+
+**Property 117: Feature adoption tracking**
+_For any_ admin reviewing feature adoption, usage statistics for each platform module should be displayed.
+**Validates: Requirements 41.3**
+
+### Notification Preference Properties
+
+**Property 118: Notification category toggle**
+_For any_ notification category disabled by a user, notifications of that type should stop being sent.
+**Validates: Requirements 33.2**
+
+**Property 119: Notification category enable**
+_For any_ notification category enabled by a user, notifications of that type should resume.
+**Validates: Requirements 33.3**
+
+**Property 120: Critical notification override**
+_For any_ critical notification (emergency alerts, security warnings), it should be sent regardless of user preferences.
+**Validates: Requirements 33.4**
+
+**Property 121: Quiet hours respect**
+_For any_ non-critical notification during user-set quiet hours, it should be suppressed.
+**Validates: Requirements 33.5**
+
+### Venue Management Properties
+
+**Property 122: Venue listing creation**
+_For any_ venue listing created by a seller, details including name, type, location, capacity, and pricing should be stored.
+**Validates: Requirements 27.1**
+
+**Property 123: Venue availability update**
+_For any_ venue availability update by a seller, changes should be reflected in the booking system immediately.
+**Validates: Requirements 27.2**
+
+**Property 124: Venue blocked dates**
+_For any_ blocked dates set by a seller, reservations should be prevented for those time slots.
+**Validates: Requirements 27.3**
+
+**Property 125: Venue reservation notification**
+_For any_ reservation made, the venue owner should be notified with booking details.
+**Validates: Requirements 27.4**
+
+**Property 126: Venue deactivation**
+_For any_ venue deactivated by a seller, it should be hidden from search results and prevent new reservations.
+**Validates: Requirements 27.5**
+
+### Admin Dashboard Properties
+
+**Property 127: User management capabilities**
+_For any_ admin managing users, search, filter, edit, and deactivate capabilities should be provided.
+**Validates: Requirements 47.2**
+
+**Property 128: Venue management capabilities**
+_For any_ admin managing venues, approval, editing, and removal capabilities should be provided.
+**Validates: Requirements 47.3**
+
+**Property 129: Offer management capabilities**
+_For any_ admin managing offers, review, approve, and reject capabilities should be provided.
+**Validates: Requirements 47.4**
+
+**Property 130: Content moderation capabilities**
+_For any_ admin managing content, moderation of reviews, chat messages, and reported content should be allowed.
+**Validates: Requirements 47.5**
+
+**Property 131: Platform settings update**
+_For any_ platform settings updated by an admin, changes should be applied immediately to all users.
+**Validates: Requirements 48.1**
+
+**Property 132: Payment settings configuration**
+_For any_ payment settings configured by an admin, payment gateway parameters and fee structures should be updated.
+**Validates: Requirements 48.2**
+
+**Property 133: Feature flag control**
+_For any_ feature flag set by an admin, specific features should be enabled or disabled for all users or specific user groups.
+**Validates: Requirements 48.3**
+
+### Logging Properties
+
+**Property 134: Critical operation logging**
+_For any_ critical operation, the operation type, user identifier, timestamp, and outcome should be logged.
+**Validates: Requirements 50.1**
+
+**Property 135: Error logging**
+_For any_ error occurrence, the error message, stack trace, and context information should be logged.
+**Validates: Requirements 50.2**
+
+**Property 136: Security event logging**
+_For any_ security event, it should be logged with high priority and admins alerted.
+**Validates: Requirements 50.4**
+
 ## Error Handling
 
 ### Error Categories
 
 1. **Validation Errors (400 Bad Request)**
 
-   - Invalid input format
-   - Missing required fields
-   - Data constraint violations
-   - Business rule violations
+    - Invalid input format
+    - Missing required fields
+    - Data constraint violations
+    - Business rule violations
 
 2. **Authentication Errors (401 Unauthorized)**
 
-   - Invalid credentials
-   - Expired tokens
-   - Missing authentication
+    - Invalid credentials
+    - Expired tokens
+    - Missing authentication
 
 3. **Authorization Errors (403 Forbidden)**
 
-   - Insufficient permissions
-   - Role-based access denial
+    - Insufficient permissions
+    - Role-based access denial
 
 4. **Not Found Errors (404 Not Found)**
 
-   - Resource does not exist
-   - Invalid resource ID
+    - Resource does not exist
+    - Invalid resource ID
 
 5. **Conflict Errors (409 Conflict)**
 
-   - Duplicate resource
-   - Concurrent modification
-   - State conflict
+    - Duplicate resource
+    - Concurrent modification
+    - State conflict
 
 6. **Server Errors (500 Internal Server Error)**
-   - Unexpected exceptions
-   - Database errors
-   - External service failures
+    - Unexpected exceptions
+    - Database errors
+    - External service failures
 
 ### Error Response Format
 
@@ -1153,16 +1530,16 @@ All API errors follow a consistent JSON structure:
 
 ```json
 {
-	"error": {
-		"code": "ERROR_CODE",
-		"message": "Human-readable error message",
-		"details": {
-			"field": "specific field error",
-			"constraint": "violated constraint"
-		},
-		"timestamp": "2024-01-01T12:00:00Z",
-		"request_id": "unique-request-identifier"
-	}
+    "error": {
+        "code": "ERROR_CODE",
+        "message": "Human-readable error message",
+        "details": {
+            "field": "specific field error",
+            "constraint": "violated constraint"
+        },
+        "timestamp": "2024-01-01T12:00:00Z",
+        "request_id": "unique-request-identifier"
+    }
 }
 ```
 
@@ -1170,35 +1547,35 @@ All API errors follow a consistent JSON structure:
 
 **Database Errors**:
 
-- Wrap all database operations in try-catch blocks
-- Log full error details for debugging
-- Return generic error messages to clients
-- Implement retry logic for transient failures
+-   Wrap all database operations in try-catch blocks
+-   Log full error details for debugging
+-   Return generic error messages to clients
+-   Implement retry logic for transient failures
 
 **External Service Failures**:
 
-- Implement circuit breaker pattern
-- Use cached data when available
-- Provide degraded functionality
-- Queue operations for retry
+-   Implement circuit breaker pattern
+-   Use cached data when available
+-   Provide degraded functionality
+-   Queue operations for retry
 
 **Validation Errors**:
 
-- Validate at multiple layers (request, service, model)
-- Return specific field-level errors
-- Use Laravel Form Requests for input validation
+-   Validate at multiple layers (request, service, model)
+-   Return specific field-level errors
+-   Use Laravel Form Requests for input validation
 
 **Concurrent Access**:
 
-- Use database transactions with appropriate isolation levels
-- Implement optimistic locking for critical resources
-- Handle deadlocks with retry logic
+-   Use database transactions with appropriate isolation levels
+-   Implement optimistic locking for critical resources
+-   Handle deadlocks with retry logic
 
 **Rate Limiting**:
 
-- Return 429 Too Many Requests with Retry-After header
-- Implement per-user and per-IP rate limits
-- Use Redis for distributed rate limiting
+-   Return 429 Too Many Requests with Retry-After header
+-   Implement per-user and per-IP rate limits
+-   Use Redis for distributed rate limiting
 
 ## Testing Strategy
 
@@ -1208,25 +1585,25 @@ Unit tests verify individual components in isolation using PHPUnit:
 
 **Test Coverage**:
 
-- Service layer business logic
-- Repository data access methods
-- Model relationships and scopes
-- Validation rules
-- Helper functions and utilities
+-   Service layer business logic
+-   Repository data access methods
+-   Model relationships and scopes
+-   Validation rules
+-   Helper functions and utilities
 
 **Mocking Strategy**:
 
-- Mock external dependencies (APIs, payment gateways)
-- Use in-memory database for repository tests
-- Mock Laravel facades where appropriate
+-   Mock external dependencies (APIs, payment gateways)
+-   Use in-memory database for repository tests
+-   Mock Laravel facades where appropriate
 
 **Example Unit Tests**:
 
-- Test user registration with valid data creates user
-- Test duplicate email registration fails
-- Test password hashing on user creation
-- Test role assignment updates permissions
-- Test venue availability checking logic
+-   Test user registration with valid data creates user
+-   Test duplicate email registration fails
+-   Test password hashing on user creation
+-   Test role assignment updates permissions
+-   Test venue availability checking logic
 
 ### Property-Based Testing
 
@@ -1234,14 +1611,14 @@ Property-based tests verify universal properties using Pest PHP with the Pest Pr
 
 **Configuration**:
 
-- Use Pest PHP as the testing framework
-- Configure each property test to run minimum 100 iterations
-- Use custom generators for domain-specific data types
+-   Use Pest PHP as the testing framework
+-   Configure each property test to run minimum 100 iterations
+-   Use custom generators for domain-specific data types
 
 **Test Tagging**:
 
-- Each property-based test MUST include a comment with format: `// Feature: user-authentication-roles, Property {number}: {property_text}`
-- Example: `// Feature: user-authentication-roles, Property 1: Valid registration creates user with default role`
+-   Each property-based test MUST include a comment with format: `// Feature: user-authentication-roles, Property {number}: {property_text}`
+-   Example: `// Feature: user-authentication-roles, Property 1: Valid registration creates user with default role`
 
 **Property Test Examples**:
 
@@ -1321,17 +1698,17 @@ Integration tests verify interactions between components:
 
 **Test Scenarios**:
 
-- Complete user registration and login flow
-- Event creation, payment, and participation flow
-- Venue search, reservation, and cancellation flow
-- Rescue request creation and assignment flow
-- Message sending and delivery flow
+-   Complete user registration and login flow
+-   Event creation, payment, and participation flow
+-   Venue search, reservation, and cancellation flow
+-   Rescue request creation and assignment flow
+-   Message sending and delivery flow
 
 **Database Strategy**:
 
-- Use SQLite in-memory database for speed
-- Reset database between tests
-- Use factories and seeders for test data
+-   Use SQLite in-memory database for speed
+-   Reset database between tests
+-   Use factories and seeders for test data
 
 ### API Testing
 
@@ -1339,17 +1716,17 @@ API tests verify endpoint behavior:
 
 **Test Coverage**:
 
-- Request validation
-- Authentication and authorization
-- Response format and status codes
-- Error handling
-- Rate limiting
+-   Request validation
+-   Authentication and authorization
+-   Response format and status codes
+-   Error handling
+-   Rate limiting
 
 **Tools**:
 
-- Laravel HTTP testing
-- Pest PHP for test organization
-- Postman collections for manual testing
+-   Laravel HTTP testing
+-   Pest PHP for test organization
+-   Postman collections for manual testing
 
 ### End-to-End Testing
 
@@ -1357,15 +1734,15 @@ E2E tests verify complete user workflows:
 
 **Test Scenarios**:
 
-- User registers, creates group, creates event, other user joins
-- User searches venues, makes reservation, receives confirmation
-- User triggers rescue request, rescue team member responds
-- Seller creates offer, user browses and saves offer
+-   User registers, creates group, creates event, other user joins
+-   User searches venues, makes reservation, receives confirmation
+-   User triggers rescue request, rescue team member responds
+-   Seller creates offer, user browses and saves offer
 
 **Tools**:
 
-- Laravel Dusk for browser testing
-- Simulate mobile app behavior through API calls
+-   Laravel Dusk for browser testing
+-   Simulate mobile app behavior through API calls
 
 ### Performance Testing
 
@@ -1373,16 +1750,16 @@ Performance tests verify system scalability:
 
 **Test Scenarios**:
 
-- Concurrent user registrations
-- High-volume location updates
-- Simultaneous venue reservations
-- Bulk notification sending
+-   Concurrent user registrations
+-   High-volume location updates
+-   Simultaneous venue reservations
+-   Bulk notification sending
 
 **Tools**:
 
-- Apache JMeter for load testing
-- Laravel Telescope for profiling
-- Database query optimization
+-   Apache JMeter for load testing
+-   Laravel Telescope for profiling
+-   Database query optimization
 
 ### Security Testing
 
@@ -1390,12 +1767,12 @@ Security tests verify protection mechanisms:
 
 **Test Coverage**:
 
-- SQL injection prevention
-- XSS prevention
-- CSRF protection
-- Authentication bypass attempts
-- Authorization bypass attempts
-- Rate limiting effectiveness
+-   SQL injection prevention
+-   XSS prevention
+-   CSRF protection
+-   Authentication bypass attempts
+-   Authorization bypass attempts
+-   Rate limiting effectiveness
 
 ## Deployment and Infrastructure
 
@@ -1403,26 +1780,26 @@ Security tests verify protection mechanisms:
 
 **Development**:
 
-- Local MySQL and Redis
-- Local file storage
-- Sandbox payment gateway
-- Mock external services
+-   Local MySQL and Redis
+-   Local file storage
+-   Sandbox payment gateway
+-   Mock external services
 
 **Staging**:
 
-- AWS RDS MySQL
-- AWS ElastiCache Redis
-- AWS S3 storage
-- Staging payment gateway
-- Real external services with test credentials
+-   AWS RDS MySQL
+-   AWS ElastiCache Redis
+-   AWS S3 storage
+-   Staging payment gateway
+-   Real external services with test credentials
 
 **Production**:
 
-- AWS RDS MySQL with Multi-AZ
-- AWS ElastiCache Redis cluster
-- AWS S3 with CloudFront CDN
-- Production payment gateway
-- Real external services
+-   AWS RDS MySQL with Multi-AZ
+-   AWS ElastiCache Redis cluster
+-   AWS S3 with CloudFront CDN
+-   Production payment gateway
+-   Real external services
 
 ### Deployment Strategy
 
@@ -1440,90 +1817,90 @@ Security tests verify protection mechanisms:
 
 **Database Migrations**:
 
-- Run migrations before deployment
-- Use Laravel migration system
-- Maintain backward compatibility
-- Test migrations on staging first
+-   Run migrations before deployment
+-   Use Laravel migration system
+-   Maintain backward compatibility
+-   Test migrations on staging first
 
 **Zero-Downtime Deployment**:
 
-- Use blue-green deployment strategy
-- Health checks before routing traffic
-- Gradual traffic shifting
-- Automatic rollback on errors
+-   Use blue-green deployment strategy
+-   Health checks before routing traffic
+-   Gradual traffic shifting
+-   Automatic rollback on errors
 
 ### Monitoring and Logging
 
 **Application Monitoring**:
 
-- Laravel Telescope for local debugging
-- Sentry for error tracking
-- New Relic for APM
-- Custom metrics for business KPIs
+-   Laravel Telescope for local debugging
+-   Sentry for error tracking
+-   New Relic for APM
+-   Custom metrics for business KPIs
 
 **Infrastructure Monitoring**:
 
-- AWS CloudWatch for infrastructure metrics
-- Database performance monitoring
-- Redis monitoring
-- API response time tracking
+-   AWS CloudWatch for infrastructure metrics
+-   Database performance monitoring
+-   Redis monitoring
+-   API response time tracking
 
 **Logging Strategy**:
 
-- Structured JSON logging
-- Log levels: DEBUG, INFO, WARNING, ERROR, CRITICAL
-- Centralized logging with ELK stack
-- Log retention: 30 days for INFO, 90 days for ERROR
+-   Structured JSON logging
+-   Log levels: DEBUG, INFO, WARNING, ERROR, CRITICAL
+-   Centralized logging with ELK stack
+-   Log retention: 30 days for INFO, 90 days for ERROR
 
 **Alerting**:
 
-- Error rate thresholds
-- Response time degradation
-- Database connection issues
-- External service failures
-- Security events
+-   Error rate thresholds
+-   Response time degradation
+-   Database connection issues
+-   External service failures
+-   Security events
 
 ### Scalability Considerations
 
 **Horizontal Scaling**:
 
-- Stateless API servers behind load balancer
-- Session storage in Redis
-- File storage in S3
-- Database read replicas
+-   Stateless API servers behind load balancer
+-   Session storage in Redis
+-   File storage in S3
+-   Database read replicas
 
 **Caching Strategy**:
 
-- Redis for session storage
-- Redis for cache storage
-- Cache weather data (30 minutes)
-- Cache venue search results (5 minutes)
-- Cache user permissions (until role change)
+-   Redis for session storage
+-   Redis for cache storage
+-   Cache weather data (30 minutes)
+-   Cache venue search results (5 minutes)
+-   Cache user permissions (until role change)
 
 **Queue Processing**:
 
-- Laravel Queues with Redis driver
-- Separate queues for different priorities
-- Queue workers scaled independently
-- Failed job retry logic
+-   Laravel Queues with Redis driver
+-   Separate queues for different priorities
+-   Queue workers scaled independently
+-   Failed job retry logic
 
 **Database Optimization**:
 
-- Proper indexing on frequently queried columns
-- Query optimization and N+1 prevention
-- Connection pooling
-- Read replicas for reporting queries
+-   Proper indexing on frequently queried columns
+-   Query optimization and N+1 prevention
+-   Connection pooling
+-   Read replicas for reporting queries
 
 ## API Documentation
 
 API documentation will be generated using Scribe for Laravel, providing:
 
-- Complete endpoint listing
-- Request/response examples
-- Authentication requirements
-- Error responses
-- Rate limiting information
-- Postman collection export
+-   Complete endpoint listing
+-   Request/response examples
+-   Authentication requirements
+-   Error responses
+-   Rate limiting information
+-   Postman collection export
 
 Documentation will be accessible at `/docs` endpoint and updated automatically on deployment.
 
@@ -1531,44 +1908,44 @@ Documentation will be accessible at `/docs` endpoint and updated automatically o
 
 **Authentication Security**:
 
-- Bcrypt/Argon2 password hashing
-- Token-based authentication with expiration
-- Refresh token rotation
-- Account lockout after failed attempts
-- Password strength requirements
+-   Bcrypt/Argon2 password hashing
+-   Token-based authentication with expiration
+-   Refresh token rotation
+-   Account lockout after failed attempts
+-   Password strength requirements
 
 **Authorization Security**:
 
-- Role-based access control
-- Permission checks on all protected endpoints
-- Principle of least privilege
-- Audit logging for sensitive operations
+-   Role-based access control
+-   Permission checks on all protected endpoints
+-   Principle of least privilege
+-   Audit logging for sensitive operations
 
 **Data Security**:
 
-- Encryption at rest for sensitive data
-- Encryption in transit (HTTPS only)
-- Payment data tokenization
-- PII data protection
-- GDPR compliance measures
+-   Encryption at rest for sensitive data
+-   Encryption in transit (HTTPS only)
+-   Payment data tokenization
+-   PII data protection
+-   GDPR compliance measures
 
 **API Security**:
 
-- Rate limiting per user and IP
-- CORS configuration
-- CSRF protection
-- Input validation and sanitization
-- SQL injection prevention
-- XSS prevention
+-   Rate limiting per user and IP
+-   CORS configuration
+-   CSRF protection
+-   Input validation and sanitization
+-   SQL injection prevention
+-   XSS prevention
 
 **Infrastructure Security**:
 
-- VPC with private subnets
-- Security groups and NACLs
-- Regular security updates
-- Secrets management (AWS Secrets Manager)
-- Database encryption
-- Backup encryption
+-   VPC with private subnets
+-   Security groups and NACLs
+-   Regular security updates
+-   Secrets management (AWS Secrets Manager)
+-   Database encryption
+-   Backup encryption
 
 ## Conclusion
 

@@ -8,10 +8,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements FilamentUser
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -22,11 +23,18 @@ class User extends Authenticatable implements FilamentUser
         'name',
         'email',
         'password',
-        'role',
+        'nickname',
         'phone',
         'avatar',
         'bio',
+        'profile_picture',
+        'privacy_settings',
         'is_active',
+        'last_login_at',
+        'last_login_ip',
+        'last_login_device',
+        'failed_login_attempts',
+        'locked_until',
     ];
 
     /**
@@ -50,17 +58,48 @@ class User extends Authenticatable implements FilamentUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'privacy_settings' => 'array',
+            'last_login_at' => 'datetime',
+            'locked_until' => 'datetime',
         ];
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
     }
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->role === 'admin' || $this->role === 'seller';
+        return $this->hasRole('Admin') || $this->hasRole('Seller');
     }
 
-    public function hasRole(string $role): bool
+    public function hasRole(string $roleName): bool
     {
-        return $this->role === $role;
+        return $this->roles()->where('name', $roleName)->exists();
+    }
+
+    public function hasPermission(string $permission): bool
+    {
+        return $this->roles->flatMap(function ($role) {
+            return $role->permissions ?? [];
+        })->contains($permission);
+    }
+
+    public function assignRole(string $roleName): void
+    {
+        $role = Role::where('name', $roleName)->first();
+        if ($role && !$this->hasRole($roleName)) {
+            $this->roles()->attach($role->id);
+        }
+    }
+
+    public function removeRole(string $roleName): void
+    {
+        $role = Role::where('name', $roleName)->first();
+        if ($role) {
+            $this->roles()->detach($role->id);
+        }
     }
 
     public function ownedTeams()

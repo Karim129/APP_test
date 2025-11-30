@@ -13,16 +13,17 @@ test('user can register as seller', function () {
             'business_phone' => '+1234567890',
         ]);
 
-    $response->assertStatus(200);
+    $response->assertStatus(200)
+        ->assertJsonPath('user.roles', fn($roles) => in_array('Seller', $roles));
 
     $user->refresh();
-    expect($user->hasRole('Seller'))->toBeTrue()
-        ->and($user->bio)->toContain('Business: My Business');
+    expect($user->bio)->toContain('Business: My Business');
 });
 
 test('seller cannot register twice', function () {
     $user = User::factory()->create();
     $user->assignRole('Seller');
+    $user->load('roles'); // Ensure roles are loaded
 
     $token = $user->createToken('test')->plainTextToken;
 

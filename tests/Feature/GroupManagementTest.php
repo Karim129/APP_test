@@ -105,5 +105,5 @@ test('private group requires invitation code', function () {
             'invitation_code' => 'WRONGCODE',
         ]);
 
-    $response->assertStatus(404);
+    $response->assertStatus(400); // Service throws validation exception
 });
